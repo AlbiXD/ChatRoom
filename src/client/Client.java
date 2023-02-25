@@ -34,9 +34,6 @@ public class Client implements Runnable {
 			e.printStackTrace();
 		}
 
-		System.out.println("Enter a username");
-		name = scan.nextLine();
-
 		Thread thread = new Thread(this);
 		thread.start();
 
@@ -49,7 +46,7 @@ public class Client implements Runnable {
 	 */
 	public void requestMessage() {
 		while (!socket.isClosed()) {
-			out.println(name + ": " + scan.nextLine());
+			out.println(scan.nextLine());
 		}
 
 	}

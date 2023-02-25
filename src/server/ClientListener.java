@@ -12,43 +12,105 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class ClientListener implements Runnable {
 
 	private BufferedReader in; // BufferedReader for clients
 	private Socket client; // Socket for the client
 	private PrintWriter out; // PrintWriter for clients
+	private String username;
+	private String email;
+	private boolean logedIn = false;
 
-	/**
-	 * The constructor to assign a Client Listener to each client
-	 * 
-	 * @param client - The client we are trying to listen to
-	 */
 	public ClientListener(Socket client) {
 		this.client = client;
 		try {
-			out = new PrintWriter(client.getOutputStream(), true); // Gets the output stream for the client
-			in = new BufferedReader(new InputStreamReader(client.getInputStream())); // Gets the input stream for the
-																						// client
+			out = new PrintWriter(client.getOutputStream(), true);
+			in = new BufferedReader(new InputStreamReader(client.getInputStream()));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
-		Thread thread = new Thread(this); // Creates a separate thread for receiving and sending messages
+		Thread thread = new Thread(this);
 		thread.start();
 	}
 
 	@Override
-	/**
-	 * This thread is responsible for receiving incoming messages and sending the
-	 * message to other clients in the server
-	 */
+	// Reads messages from client and broadcasts to others
 	public void run() {
 		while (true) {
+			while (!logedIn) {
+				out.println("Press 1 to Log-In\nPress 2 to Sign-Up");
+				String msg = null;
+
+				try {
+					msg = in.readLine();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+
+				if (msg.equals("1")) {
+					String email = null;
+					String password = null;
+
+					try {
+						out.println("Enter Email");
+						email = in.readLine();
+
+						out.println("Enter Password");
+						password = in.readLine();
+
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+
+					if ((Server.getSql().getUser().logIn(email, password) == true)) {
+						out.println("Log In Successful");
+						logedIn = true;
+						this.email = email;
+						try {
+							ResultSet rs = Server.getSql().getConnection().createStatement()
+									.executeQuery("SELECT username FROM albi.user where email = '" + email + "'");
+
+							while (rs.next()) {
+								this.username = rs.getString("username");
+							}
+
+						} catch (SQLException e) {
+							e.printStackTrace();
+						}
+						break;
+					} else {
+						out.println("Log-In Failed");
+					}
+				}
+				if (msg.equals("2")) {
+					try {
+						out.println("Enter Username: ");
+						String username = in.readLine();
+
+						out.println("Enter Email: ");
+						String email = in.readLine();
+
+						out.println("Enter Password: ");
+						String password = in.readLine();
+
+						Server.getSql().getUser().signUp(email, username, password, out);
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+
+			}
+
 			try {
 				// Receives message
 				String msg = in.readLine();
-				System.out.println(msg);
+				System.out.println(this.username + ": " + msg);
 				broadcastMessage(msg, client);
 
 			} catch (IOException e) {
@@ -58,43 +120,25 @@ public class ClientListener implements Runnable {
 		}
 	}
 
-	/**
-	 * Gets the client that we are currently listening to
-	 * 
-	 * @return Socket client - returns the client that is being listened
-	 */
 	public Socket getClient() {
 		return client;
 	}
 
-	/**
-	 * Sets the client field to the client we specify
-	 * 
-	 * @param Socket client - the client we are setting
-	 */
 	public void setClient(Socket client) {
 		this.client = client;
 	}
 
-	/**
-	 * Returns the output stream of a client
-	 * 
-	 * @return PrintWriter out - returns the output stream for the user
-	 */
 	public PrintWriter getOutput() {
 		return out;
 	}
 
 	/**
-	 * This method broadcasts a users message to other users
 	 * 
-	 * @param String message - Gets the message that the client sent
-	 * @param Socket client - Gets the client that sends the message
 	 */
 	public void broadcastMessage(String message, Socket client) {
 		for (ClientListener cl : Server.clients) {
 			if (!(cl.getClient().equals(client))) {
-				cl.getOutput().println(message);
+				cl.getOutput().println(this.username + ": " + message);
 			}
 		}
 

@@ -14,10 +14,13 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
+import sql.SQLConnector;
+
 public class Server {
 
 	private int port; // port number for the server
 	private ServerSocket socket; // socket object for the server
+	private static SQLConnector sql;
 	public static List<ClientListener> clients; // a list of ClientListeners
 
 	/**
@@ -30,7 +33,8 @@ public class Server {
 		clients = new ArrayList<>();// Instantiates the list
 
 		try {
-			socket = new ServerSocket(this.port); // Instantiates the socket field with a new ServerSocket object
+			this.socket = new ServerSocket(port); // Instantiates the socket field with a new ServerSocket object
+			this.sql = new SQLConnector("Gghjfk337@");
 			System.out.println("Server is running..."); // Relays a server running message to console
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -47,6 +51,7 @@ public class Server {
 		try {
 			while (!socket.isClosed()) {
 				Socket client = socket.accept(); // Accepts user
+
 				System.out.println("Client has connected"); // User accepted message
 
 				ClientListener cl = new ClientListener(client); // Creates a client listener for each clients
@@ -59,11 +64,16 @@ public class Server {
 
 	}
 
+	public static SQLConnector getSql() {
+		return sql;
+	}
+
 	/**
 	 * The main class to run an instance of the Server
 	 */
 	public static void main(String[] args) {
 		new Server(1234);
+
 	}
 
 }
