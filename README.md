@@ -15,4 +15,5 @@ The chat room has incoroprated some elements of SQL into it by allowing users to
   ![Sign Up Page](https://user-images.githubusercontent.com/102504290/222876145-780f284b-8c05-446a-93aa-bcbb4b1941ee.PNG)
 
 
-[Entity.drawio.pdf](https://github.com/AlbiXD/ChatRoom/files/10887495/Entity.drawio.pdf)
+
+![EntityRelationship](https://user-images.githubusercontent.com/102504290/222876507-53e68c45-128c-4500-a272-10468e14c81e.PNG)
