@@ -45,18 +45,18 @@ public class UserTable {
 	/**
 	 * Sign-Up Method to add the user in the database
 	 */
-	public boolean signUp(String email, String username, String password, PrintWriter out) {
+	public boolean signUp(String email, String username, String password) {
 		ResultSet rs;
 
 		// Check if username is less than 6 or greater than 12
 		if (username.length() < 6 || username.length() > 12) {
-			out.println("Invalid Amount of Characters");
+			System.out.println("Invalid Amount of Characters");
 			return false;
 		}
 
 		// Check if username is greater than 6 characters and less than 12 characters
 		if (password.length() < 6) {
-			out.println("Invalid Amount of Characters");
+			System.out.println("Invalid Amount of Characters");
 			return false;
 		}
 
@@ -65,11 +65,11 @@ public class UserTable {
 			rs = stmnt.executeQuery("Select email, username from albi.user");
 			while (rs.next()) {
 				if (email.equals(rs.getString("email"))) {
-					out.println("Email already exists");
+					System.out.println("Email already exists");
 					return false;
 				}
 				if (username.equals(rs.getString("username"))) {
-					out.println("Username already exists");
+					System.out.println("Username already exists");
 					return false;
 				}
 			}
@@ -90,7 +90,7 @@ public class UserTable {
 
 			stmnt3.execute();
 
-			out.println("Sign Up Successful");
+			System.out.println("Sign Up Successful");
 			return true;
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -102,14 +102,14 @@ public class UserTable {
 	/**
 	 * Log-In method to log in the user to the network
 	 */
-	public boolean logIn(String email, String password) {
+	public boolean logIn(String username, String password) {
 		// check if email exists
 		ResultSet rs;
 		try {
-			rs = this.stmnt.executeQuery("SELECT email, password FROM albi.user");
+			rs = this.stmnt.executeQuery("SELECT username, password FROM albi.user");
 
 			while (rs.next()) {
-				if (rs.getString("email").equals(email)) {
+				if (rs.getString("username").equals(username)) {
 					if (rs.getString("password").equals(password)) {
 						return true;
 					}

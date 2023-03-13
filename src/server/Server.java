@@ -18,9 +18,10 @@ import sql.SQLConnector;
 
 public class Server {
 
+	@SuppressWarnings("unused")
 	private int port; // port number for the server
 	private ServerSocket socket; // socket object for the server
-	private static SQLConnector sql;
+	private static SQLConnector sql = new SQLConnector("albi", "root", "Gghjfk337@");;
 	public static List<ClientListener> clients; // a list of ClientListeners
 
 	/**
@@ -34,13 +35,12 @@ public class Server {
 
 		try {
 			this.socket = new ServerSocket(port); // Instantiates the socket field with a new ServerSocket object
-			this.sql = new SQLConnector("Gghjfk337@");
+			connectionLoop(); // calls the connectionLoop method
+
 			System.out.println("Server is running..."); // Relays a server running message to console
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
-		connectionLoop(); // calls the connectionLoop method
 
 	}
 
