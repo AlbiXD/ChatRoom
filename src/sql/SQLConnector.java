@@ -19,7 +19,7 @@ public class SQLConnector {
 
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
-			connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/albi", username, password);
+			connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test", username, password);
 
 			user = UserTable.getInstance(connection);
 

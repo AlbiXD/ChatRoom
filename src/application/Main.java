@@ -34,8 +34,10 @@ public class Main extends Application {
 	@FXML
 	private TextField myTextField;
 
+	@FXML
+	private TextArea activeUserTextArea;
+
 	private Client client;
-	private String username;
 
 	private Stage stage;
 
@@ -60,10 +62,13 @@ public class Main extends Application {
 	@FXML
 	public void onSend(ActionEvent e) {
 
-		client.sendMessage(username + ": " + myTextField.getText());
+		if (myTextField.getText().substring(0, 1).equals(" ")) {
+			return;
+		}
+		client.sendMessage(myTextField.getText());
 		textArea.setText(textArea.getText() + myTextField.getText() + "\n");
 		myTextField.setText("");
-
+		System.out.println(Client.activeUsers);
 	}
 
 	@FXML
@@ -73,24 +78,42 @@ public class Main extends Application {
 			return;
 		}
 
-		client = new Client(1234);
+		client = new Client(1234, emailField.getText());
 		client.setMain(this);
+		
+		
+		
+		client.sendUsername(this.emailField.getText());
 
+		
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+		
+		if(Client.activeUsers.contains(emailField.getText())) {
+			
+			client.getSocket().close();
+			return;
+		}
+		
+		
 		FXMLLoader loader = new FXMLLoader(getClass().getResource("ChatUI.fxml"));
 		loader.setController(this);
 
 		Parent root = loader.load();
 
 		StackPane container = new StackPane(root);
-		container.setPrefSize(800, 500);
+		container.setPrefSize(1031, 500);
 
 		Scene scene = new Scene(container);
 
 		stage = (Stage) ((Node) e.getSource()).getScene().getWindow();
 
 		stage.setScene(scene);
-
-		this.username = emailField.getText();
 
 	}
 
@@ -133,6 +156,10 @@ public class Main extends Application {
 	public void setText(String readLine) {
 		textArea.setText(textArea.getText() + readLine + "\n");
 
+	}
+
+	public TextArea getActiveUserTextArea() {
+		return this.activeUserTextArea;
 	}
 
 }

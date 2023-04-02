@@ -1,31 +1,24 @@
 package server;
 
-/**
- * The ClientListener class essentially creates a whole separate thread
- * for the Server to receive and send messages.
- * 
- * @author	Albi Zhaku
- */
-
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ClientListener implements Runnable {
 
-	private BufferedReader in; // BufferedReader for clients
+	private ObjectInputStream in; // BufferedReader for clients
 	private Socket client; // Socket for the client
-	private PrintWriter out; // PrintWriter for clients
+	private ObjectOutputStream out; // PrintWriter for clients
+	public String username;
 
 	public ClientListener(Socket client) {
 		this.client = client;
 		try {
-			out = new PrintWriter(client.getOutputStream(), true);
-			in = new BufferedReader(new InputStreamReader(client.getInputStream()));
+			out = new ObjectOutputStream(client.getOutputStream());
+			in = new ObjectInputStream(client.getInputStream());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -38,15 +31,31 @@ public class ClientListener implements Runnable {
 	// This thread reads messages from client and broadcasts to others
 	public void run() {
 		while (true) {
+			Object obj;
+
 			try {
-				// Receives message
-				String msg = in.readLine();
-				System.out.println(msg);
-				broadcastMessage(msg, client);
+				obj = in.readObject();
+
+				if (obj instanceof String) {
+					if (username == null) {
+						this.username = obj.toString();
+						System.out.println(username);
+					} else {
+
+						String message = obj.toString();
+						broadcastMessage(message, client);
+						System.out.println(message);
+					}
+				}
 
 			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (ClassNotFoundException e) {
+				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+
 		}
 
 	}
@@ -59,8 +68,12 @@ public class ClientListener implements Runnable {
 		this.client = client;
 	}
 
-	public PrintWriter getOutput() {
+	public ObjectOutputStream getOutput() {
 		return out;
+	}
+
+	public String getUsername() {
+		return this.username;
 	}
 
 	/**
@@ -69,11 +82,36 @@ public class ClientListener implements Runnable {
 	public void broadcastMessage(String message, Socket client) {
 		for (ClientListener cl : Server.clients) {
 			if (!(cl.getClient().equals(client))) {
-				cl.getOutput().println(message);
+				try {
+				cl.getOutput().writeObject(message);
+				cl.getOutput().flush();
 
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
+		}
+		}
+	}
+
+	public void broadcastList(List<String> onlineUsers, String connectedUser) {
+
+		for (ClientListener cl : Server.clients) {
+			try {
+				cl.getOutput().writeObject(onlineUsers);
+				cl.getOutput().flush();
+				cl.getOutput().reset();
+
+
+				cl.getOutput().writeObject(connectedUser + " has connected!");
+				cl.getOutput().flush();
+			
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
 		}
 
 	}
-
 }

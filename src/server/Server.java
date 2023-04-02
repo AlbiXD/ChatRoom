@@ -21,8 +21,9 @@ public class Server {
 	@SuppressWarnings("unused")
 	private int port; // port number for the server
 	private ServerSocket socket; // socket object for the server
-	private static SQLConnector sql = new SQLConnector("albi", "root", "Gghjfk337@");;
+	private static SQLConnector sql = new SQLConnector("test", "root", "");;
 	public static List<ClientListener> clients; // a list of ClientListeners
+	private static List<String> onlineUsers = new ArrayList<>(); // a list of ClientListeners
 
 	/**
 	 * The constructor used to create the port
@@ -32,7 +33,6 @@ public class Server {
 	public Server(int port) {
 		this.port = port;// Instantiates the port
 		clients = new ArrayList<>();// Instantiates the list
-
 		try {
 			this.socket = new ServerSocket(port); // Instantiates the socket field with a new ServerSocket object
 			connectionLoop(); // calls the connectionLoop method
@@ -56,9 +56,23 @@ public class Server {
 
 				ClientListener cl = new ClientListener(client); // Creates a client listener for each clients
 				clients.add(cl); // Adds client to clients list
+				
+				
+				Thread.sleep(100);
+			
+				
+				onlineUsers.add(cl.getUsername());
+				
+				Thread.sleep(100);
 
+				
+				System.out.println(onlineUsers);
+
+
+				cl.broadcastList(onlineUsers, cl.getUsername());
+				
 			}
-		} catch (IOException e) {
+		} catch (IOException | InterruptedException e) {
 			e.printStackTrace();
 		}
 
@@ -74,6 +88,9 @@ public class Server {
 	public static void main(String[] args) {
 		new Server(1234);
 
+	}
+	public static List<String> getActiveUsers() {
+		return onlineUsers;
 	}
 
 }

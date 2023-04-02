@@ -1,6 +1,5 @@
 package sql;
 
-import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -62,7 +61,7 @@ public class UserTable {
 
 		try {
 			// Check if email is taken
-			rs = stmnt.executeQuery("Select email, username from albi.user");
+			rs = stmnt.executeQuery("Select email, username from test.user");
 			while (rs.next()) {
 				if (email.equals(rs.getString("email"))) {
 					System.out.println("Email already exists");
@@ -75,13 +74,13 @@ public class UserTable {
 			}
 
 			// Generate user id
-			ResultSet rs3 = stmnt.executeQuery("Select count(user_id) as count from albi.user");
+			ResultSet rs3 = stmnt.executeQuery("Select count(user_id) as count from test.user");
 			rs3.next();
 
 			String user_id = "U" + rs3.getInt("count");
 
 			PreparedStatement stmnt3 = connection
-					.prepareStatement("INSERT INTO albi.user(user_id, username, email, password) VALUES(?,?,?,?);");
+					.prepareStatement("INSERT INTO test.user(user_id, username, email, password) VALUES(?,?,?,?);");
 
 			stmnt3.setString(1, user_id);
 			stmnt3.setString(2, username);
@@ -106,7 +105,7 @@ public class UserTable {
 		// check if email exists
 		ResultSet rs;
 		try {
-			rs = this.stmnt.executeQuery("SELECT username, password FROM albi.user");
+			rs = this.stmnt.executeQuery("SELECT username, password FROM test.user");
 
 			while (rs.next()) {
 				if (rs.getString("username").equals(username)) {
