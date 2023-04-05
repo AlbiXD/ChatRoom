@@ -1,5 +1,3 @@
-package server;
-
 /**
  * The Server class function is to create a server socket
  * and accept clients in order to form a baseline for communication
@@ -7,6 +5,7 @@ package server;
  *  
  * @author	Albi Zhaku
  */
+package server;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -21,7 +20,7 @@ public class Server {
 	@SuppressWarnings("unused")
 	private int port; // port number for the server
 	private ServerSocket socket; // socket object for the server
-	private static SQLConnector sql = new SQLConnector("test", "root", "");;
+	private static SQLConnector sql = new SQLConnector("test", "root", "");
 	private List<ClientListener> clients; // a list of ClientListeners
 	private List<String> onlineUsers = new ArrayList<>(); // a list of ClientListeners
 

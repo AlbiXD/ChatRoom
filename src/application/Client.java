@@ -1,3 +1,13 @@
+/**
+ * The Client class function is to connect to the server and communicate
+ * with the server back and forth.
+ * 
+ * @author	Albi Zhaku
+ */
+
+
+
+
 package application;
 
 import java.io.IOException;
